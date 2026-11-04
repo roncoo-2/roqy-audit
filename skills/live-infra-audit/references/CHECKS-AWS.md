@@ -62,9 +62,9 @@ Sources: ramimac/aws-customer-security-incidents (2014-2024) + Datadog Security 
 | # | Check | Command | Finding if | Real precedent |
 |---|---|---|---|---|
 | W33 | S3 global write | read every bucket policy for `s3:PutObject` with Principal `*` | Anyone on the internet can plant files in your bucket. LA Times 2018, Twilio 2020, PREMINT 2022 all started here |
-| W34 | Shared snapshots | `aws ec2 describe-snapshots --owner-ids self --query 'Snapshots[].{id:SnapshotId,perm:CreateVolumePermissions}'` + same for RDS | Snapshot shared to another account or all = full disk copy with baked secrets. Imperva 2019 (RDS snapshot stolen), DNC 2016 (EC2 snapshots copied) |
+| W34 | Shared snapshots | `aws ec2 describe-snapshot-attribute --snapshot-id <id> --attribute createVolumePermission` per snapshot (describe-snapshots does NOT return sharing state) + `aws rds describe-db-snapshot-attributes` per RDS snapshot | Sharing contains group:all or another account = full disk copy with baked secrets. Imperva 2019 (RDS snapshot stolen), DNC 2016 (EC2 snapshots copied) |
 | W35 | ECS exposure | `aws ecs list-clusters` + `describe-task-definition` per task: check for public ports, `aws ecs describe-services` | Task with exposed port = cryptojacking entry. Datadog 2024: "ECS is the new EC2 for crypto mining" |
-| W36 | SES abuse guard | `aws sesv2 list-account-details` (production access, sending limits) + `list-identities` | Production SES with no sending limit review = stolen key sends phishing as your domain. Kaspersky 2021, Rapid7 2024 |
+| W36 | SES abuse guard | `aws sesv2 get-account` (production access, sending limits) + `aws sesv2 list-email-identities` | Production SES with no sending limit review = stolen key sends phishing as your domain. Kaspersky 2021, Rapid7 2024 |
 | W37 | Secrets rotation | `aws secretsmanager list-secrets --query 'SecretList[].{n:Name,r:RotationEnabled}'` | RotationEnabled=false on secrets older than 90 days. FTX 2022: private keys in Secrets Manager, no rotation, no HSM |
 
 | W38 | AuthenticatedUsers grants | read bucket policies/ACLs for grants to `AuthenticatedUsers` or `http://acs.amazonaws.com/groups/global/AuthenticatedUsers` | "Not public" but open to every AWS account holder. Dow Jones 2026: 2.2M customers via exactly this |

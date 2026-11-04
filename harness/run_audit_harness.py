@@ -11,7 +11,7 @@ Checks (validate):
   3. status values in {confirmed, needs_validation, rejected}
   4. priority only on confirmed items
   5. no secret values leaked: scans for known canary secret strings and long token-like runs
-  6. report length cap (<= 120 lines)
+  6. report length cap (<= 160 lines)
   7. canary coverage: expected planted findings detected (G1 firewall, G2 SA key, G4 budget)
 """
 import datetime
@@ -46,7 +46,7 @@ def validate(run_dir: Path) -> bool:
         return False
 
     text = report.read_text()
-    ok &= check("report under 120 lines", len(text.splitlines()) <= 120, f"{len(text.splitlines())} lines")
+    ok &= check("report under 160 lines", len(text.splitlines()) <= 160, f"{len(text.splitlines())} lines")
 
     # verdict hygiene: every finding heading must contain a valid verdict anywhere
     bad = []

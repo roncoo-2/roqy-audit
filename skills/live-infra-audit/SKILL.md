@@ -14,14 +14,19 @@ metadata:
 
 Audit what is actually running, not what the repo claims. Read-only always. Output: evidence-backed findings with P0/P1/P2, verdicts confirmed / needs_validation / rejected (same model as infra-readiness-audit).
 
+## Routing
+
+Load per target: CHECKS-AWS / CHECKS-GCP / CHECKS-VPS / CHECKS-K8S / CHECKS-IAC / CHECKS-CLIENT. Load DEADLY-DETAILS.md when a finding involves docker.sock, privileged containers, nginx alias, git internals, tfstate, etcd, or CI caches — it explains the mechanism in depth. Always load RECONNAISSANCE.md and VALIDATION-AND-REPORTING.md.
+
 ## Hard safety rules
 
 1. Read-only commands only: `docker ps/inspect/images`, `ss -tlnp`, `curl -I`, `openssl s_client`, `df`, `crontab -l`, `systemctl status`, cloud `list/get/describe` calls.
-2. Never restart, stop, exec into, or reconfigure anything. Never send load or probes beyond a single HEAD request to the audited host.
+2. Never restart, stop, exec into, or reconfigure anything. Network probes: status code only (`-o /dev/null -w '%{http_code}'` or `-sI`). Never save a response body. Content-fetching checks (W39 sourcemaps, K17 /pods) require explicit written consent in scope, otherwise mark needs_validation.
+3. Kubernetes: confirm the current context in recon and pass `--context` / `--kube-context` explicitly on every kubectl and helm command. Never switch the current context.
 3. Network probes are opt-in per check: list the planned probes before the first one, let the client strike any of them, honor a refusal immediately and mark the check needs_validation ("client declined network probe"). No workarounds.
-3. Never print secret values. Redact to first 4 chars. Do not read secret file contents, only names/permissions.
-4. Confirm the target host with the user before touching a server you were not pointed at.
-5. Write output outside the repo: `~/infra-readiness-audit/<host>/<date>/live.md`.
+4. Never print secret values. Redact to first 4 chars. Do not read secret file contents, only names/permissions.
+5. Confirm the target host with the user before touching a server you were not pointed at.
+6. Write output outside the repo: `~/infra-readiness-audit/<host>/<date>/live.md`.
 
 ## Which reference file to load (load ONLY the ones for this target)
 
