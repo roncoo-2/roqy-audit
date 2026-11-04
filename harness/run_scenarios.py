@@ -119,7 +119,7 @@ def run_scenario(name: str) -> bool:
 
 
 if __name__ == "__main__":
-    names = sys.argv[1:] or ["repo", "vps", "gcp"]
+    names = sys.argv[1:] or ["repo", "vps", "aws"]  # gcp is opt-in: OAuth refresh required
     results = {}
     for n in names:
         try:
