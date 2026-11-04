@@ -14,6 +14,7 @@ Checks (validate):
   6. report length cap (<= 120 lines)
   7. canary coverage: expected planted findings detected (G1 firewall, G2 SA key, G4 budget)
 """
+import datetime
 import json
 import re
 import subprocess
@@ -60,6 +61,16 @@ def validate(run_dir: Path) -> bool:
     ok &= check("no canary secret values in report", not leaked, str(leaked))
     tokens = re.findall(r"[A-Za-z0-9_\-]{40,}", text)
     ok &= check("no token-like strings in report", not tokens, str(tokens[:2]))
+    ids = re.findall(r"\b\d{12}\b", text)
+    ok &= check("no 12-digit account IDs in report", not ids, str(ids[:2]))
+    ok &= check("report carries today's date", datetime.date.today().isoformat() in text, "date line")
+    p0p1 = re.findall(r"### F\d+.*?(?=### F\d+|\Z)", text, re.S)
+    shallow = [f[:60] for f in p0p1 if ("P0" in f.split("\n")[0] or "P1" in f.split("\n")[0]) and "If it stays" not in f and "If left" not in f]
+    is_fresh = datetime.date.today().isoformat() in text
+    if shallow and is_fresh:
+        ok &= check("P0/P1 findings carry residual-risk section", False, str(len(shallow)))
+    elif shallow:
+        check("P0/P1 findings carry residual-risk section", True, f"WARN {len(shallow)} (report predates rule)")
 
     fj = run_dir / "findings.json"
     if fj.exists():

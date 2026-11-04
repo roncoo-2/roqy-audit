@@ -95,8 +95,16 @@ def run_scenario(name: str) -> bool:
     ]
     print(f"=== SCENARIO {name} ===")
     print("RUN:", " ".join(cmd))
-    r = subprocess.run(cmd, capture_output=True, text=True, timeout=1800)
-    print("hermes exit:", r.returncode)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    log = out_dir / "hermes-run.log"
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=sc.get("timeout", 1800))
+        log.write_text((r.stdout or "") + "\n=== STDERR ===\n" + (r.stderr or ""))
+        print("hermes exit:", r.returncode, "| log:", log)
+    except subprocess.TimeoutExpired as e:
+        log.write_text(f"TIMEOUT after {sc.get('timeout', 1800)}s\n" + str(e.stdout or ""))
+        print("FAIL  hermes timed out; log:", log)
+        return False
     report = None
     for rn in sc["report_names"]:
         p = out_dir / rn
