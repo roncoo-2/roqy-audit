@@ -123,9 +123,9 @@ def validate(run_dir: Path) -> bool:
 def live() -> bool:
     out_root = Path.home() / "infra-readiness-audit" / "gcp-canary-harness"
     prompt = (
-        "Run the live-infra-audit skill in full audit mode against GCP project roqy-512012 "
+        "Run the live-infra-audit skill in full audit mode against GCP project $GCP_CANARY_PROJECT "
         "(read-only, gcloud is at /tmp/google-cloud-sdk/bin/gcloud, terraform at /tmp/terraform, "
-        "billing account 013EAB-A843BD-B58B60). "
+        "billing account from env GCP_BILLING_ACCOUNT). "
         f"Write the report to {out_root}/<today>/live.md. Do not change any resource. "
         "This is a canary project with planted findings; detect them. "
         "Every finding heading must carry exactly one verdict: CONFIRMED, NEEDS_VALIDATION, or REJECTED. "
