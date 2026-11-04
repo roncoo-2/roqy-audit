@@ -1,4 +1,4 @@
-# Live Infra Audit — vps-harness (ubuntu-8gb-nbg1-1, 178.105.86.15)
+# Live Infra Audit — vps-harness (ubuntu-8gb-nbg1-1, <vps-ip>)
 
 Date: 2026-11-04. Read-only. Raw output: raw/recon.txt, raw/checks.txt, raw/verify*.txt.
 
@@ -15,7 +15,7 @@ Date: 2026-11-04. Read-only. Raw output: raw/recon.txt, raw/checks.txt, raw/veri
 ## Findings
 
 ### F1 — Public admin and observability ports reachable (CONFIRMED, P0)
-Evidence: `curl -sI http://178.105.86.15:<p>` → 81:200 (Nginx Proxy Manager admin UI), 6006:200 (arize-phoenix serve --host 0.0.0.0), 3040:200, 631:200 (cupsd). ufw inactive; docker-proxy binds 0.0.0.0 and [::].
+Evidence: `curl -sI http://<vps-ip>:<p>` → 81:200 (Nginx Proxy Manager admin UI), 6006:200 (arize-phoenix serve --host 0.0.0.0), 3040:200, 631:200 (cupsd). ufw inactive; docker-proxy binds 0.0.0.0 and [::].
 Consequence: NPM admin UI = full proxy/credential control from the internet. Phoenix exposes traces (may contain prompts/PII).
 Fix: bind NPM admin to 127.0.0.1 or restrict via NPM access list + Hetzner firewall; stop Phoenix or bind to 127.0.0.1; disable cups or bind localhost. One change window with F2.
 Effort: 1-2h.

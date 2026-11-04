@@ -9,7 +9,7 @@ Small single-operator Next.js stack on one VPS. Secrets discipline is unusually 
 ## Findings
 
 ### F1 — CONFIRMED — P1 — Plaintext credentials committed in docker-compose.yml
-Evidence: `docker-compose.yml` lines for umami-db (`POSTGRES_PASSWORD: REDACTED-ROTATED`) and umami (`APP_SECRET: REDACTED-ROTATED`), tracked in git (`git log -1 -- docker-compose.yml` → 22d4890).
+Evidence: `docker-compose.yml` lines for umami-db (`POSTGRES_PASSWORD: umam... (redacted)`) and umami (`APP_SECRET: roqy... (redacted)`), tracked in git (`git log -1 -- docker-compose.yml` → 22d4890).
 Consequence: anyone with repo read access gets the analytics DB password and the Umami signing secret. Umami is localhost-bound, which limits remote exploitation, but the secret is now permanent git history and reusable if the DB is ever exposed (port change, firewall mistake, volume reuse).
 Fix: move both values to `.env` (already git-ignored) and reference as `${UMAMI_DB_PASSWORD}` / `${UMAMI_APP_SECRET}`; rotate both values; optionally rewrite history with git-filter-repo. Hours. Good first task.
 
