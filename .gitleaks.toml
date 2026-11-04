@@ -10,6 +10,6 @@
 [extend]
 useDefault = true
 
-[[rules.allowlists]]
+[[extend.allowlists]]
 description = "Historical audit reports: quoted findings, since redacted"
-paths = ['''docs/runs/.*\.md''']
+paths = ['docs/runs/.*\.md']
