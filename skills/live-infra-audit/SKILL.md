@@ -89,8 +89,8 @@ Full pattern and provisioning lessons in `references/CANARY-VALIDATION.md`. Summ
 
 ## Regression harness
 
-Full details in `references/VALIDATION-AND-REPORTING.md`. The audit output validator lives at /root/roqy-audit/harness/run_audit_harness.py; per-target scenario runner at /root/roqy-audit/harness/run_scenarios.py (repo / vps / gcp scenarios, gke opt-in). Run it after every skill change — it caught a priority-on-needs_validation violation and an invented-verdict heading on its first passes. Gate on artifact validation, not on the hermes process exit code. Keep the repo copy and this profile copy of the skill in sync (cp after every edit).
+Full details in `references/VALIDATION-AND-REPORTING.md`. The audit output validator and per-target scenario runner live in the harness/ directory of the roqy-audit repository (repo / vps / aws scenarios, gcp opt-in). Run it after every skill change — it caught a priority-on-needs_validation violation and an invented-verdict heading on its first passes. Gate on artifact validation, not on the hermes process exit code. Keep the repo copy and this profile copy of the skill in sync (cp after every edit).
 
 ## Deliverable packaging
 
-For client-facing audits, package the run as the roqy-audit toolkit does (/root/roqy-audit): skills/ + docs/AGENT-RUNBOOK.md (per-client step order) + docs/CLIENT-ONBOARDING-AWS.md (screen-by-screen read-only identity creation, send to client) + docs/CONTEXT-BUDGET.md (phase-per-call, output-to-files, filtered commands, resume protocol). Reuse those docs as templates instead of rewriting them per client.
+For client-facing audits, package the run as the roqy-audit toolkit does: skills/ + docs/AGENT-RUNBOOK.md (per-client step order) + docs/CLIENT-ONBOARDING-AWS.md (screen-by-screen read-only identity creation, send to client) + docs/CONTEXT-BUDGET.md (phase-per-call, output-to-files, filtered commands, resume protocol). Reuse those docs as templates instead of rewriting them per client.

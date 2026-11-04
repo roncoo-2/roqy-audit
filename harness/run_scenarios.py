@@ -2,9 +2,9 @@
 """Scenario runner: one live harness run per audit target.
 
 Scenarios:
-  repo  — infra-readiness-audit on /root/roqy (static, no live cloud)
+  repo  — infra-readiness-audit on the roqy website repo (path set via env REPO_PATH, static, no live cloud)
   vps   — live-infra-audit on this VPS (docker/ss/df, read-only)
-  gcp   — live-infra-audit on GCP canary project roqy-512012
+  gcp   — live-infra-audit on the GCP canary project (id set via env GCP_CANARY_PROJECT)
   gke   — live-infra-audit on a throwaway GKE cluster (creates + deletes, costs ~$0.10)
 
 Usage: python3 run_scenarios.py repo vps gcp [gke]
@@ -30,7 +30,7 @@ SCENARIOS = {
     "repo": {
         "skill": "infra-readiness-audit",
         "prompt": (
-            "Run the infra-readiness-audit skill in full audit mode on the repository /root/roqy. "
+            "Run the infra-readiness-audit skill in full audit mode on the repository at $REPO_PATH. "
             "Static repo review only, no live cloud commands. "
             f"Write REPORT.md and findings.json to {ROOT}/roqy-harness/<today>/. {VERDICT_RULE}"
         ),
