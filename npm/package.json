@@ -1,0 +1,11 @@
+{
+  "name": "roqy-audit-setup",
+  "version": "2.0.0",
+  "description": "One-command installer for roqy-audit read-only infrastructure audit skills (Claude Code, Cursor, Hermes).",
+  "bin": { "roqy-audit": "./bin/cli.mjs" },
+  "type": "module",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/roncoo-2/roqy-audit" },
+  "keywords": ["devops", "audit", "security", "claude", "cursor", "agent-skills"],
+  "engines": { "node": ">=18" }
+}
