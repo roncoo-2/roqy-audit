@@ -103,6 +103,36 @@ Red flags: <list>
 Guards if adopted: <pin SHA x.y.z, add to Dependabot, review at 90 days>
 ```
 
+## Update mode (before every dependency/skill upgrade)
+
+Trigger: "intake update <name> <from> <to>". Runs L7 plus the delta checks
+below. Verdicts: UPGRADE / UPGRADE-WITH-PIN / HOLD.
+
+1. Diff review: `git log --oneline v<from>..v<to>` — every commit read at
+   title level; anything touching auth, network, exec, or build gets a full
+   diff read. Red flag: commits like "misc fixes" touching auth code.
+2. New CVEs: osv-scanner on the new version's lockfile vs the old. A new
+   version that INTRODUCES a CVE is a HOLD until assessed.
+3. Maintainer change: `gh api repos/OWNER/REPO/contributors` before/after —
+   a new top committer between versions is the account-takeover pattern
+   (tj-actions 2025). Red flag: release published by a never-seen-before
+   account.
+4. License change: compare LICENSE between versions. MIT->AGPL on a
+   commercial product = SKIP the upgrade.
+5. New install-time code: diff of package.json / setup.py / install scripts.
+   New postinstall or setup hooks = full review before upgrade.
+6. Breaking-change scan: CHANGELOG + semver. Major bump without changelog
+   entry = red flag.
+7. Blast radius for us: grep our code for the APIs the new version changed.
+   If we use none of the changed surfaces, the upgrade risk drops a level.
+
+Decision rules:
+- UPGRADE: diff clean, no new CVEs, same maintainers, license unchanged.
+- UPGRADE-WITH-PIN: minor red flags (unsigned release, one suspicious commit
+  explained) — upgrade but pin the exact SHA and re-run intake in 30 days.
+- HOLD: new CVE, maintainer takeover pattern, license change, or unexplained
+  auth/exec changes. Stay on the old version; re-evaluate next release.
+
 ## Integration
 
 - Run before adding any dependency, tool, or agent skill to a production system.
