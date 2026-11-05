@@ -98,3 +98,36 @@ For each confirmed item give the smallest change that removes the risk (one Terr
 5. Printing secret values, or testing whether a key works.
 6. Running anything that changes state, even "harmless" ones like `terraform refresh`.
 7. Claiming full coverage. Say what was not checked and why.
+
+
+## Lead-magnet mode (free repo audit, no cloud access)
+
+Trigger phrase: "repo-only mode" or "lead magnet". Hard scope: local files only.
+No cloud API calls, no network probes, no curl. Anything that needs a live
+environment goes to the bridge section.
+
+Scan surface (in order):
+1. Secrets: gitleaks if installed (full history), else `git log -p` grep for
+   AKIA/sk-/ghp_/BEGIN PRIVATE KEY patterns. Report shape, never values.
+2. .git/config: core.fsmonitor, core.sshCommand, hooksPath.
+3. .gitmodules: submodule URLs pointing at forks or unknown accounts.
+4. Container: Dockerfile (root user, latest tags, no healthcheck, socket
+   mounts), docker-compose.yml (hardcoded secrets, published ports).
+5. CI: .github/workflows/*.yml — pull_request_target, mutable action refs,
+   id-token: write on untrusted triggers (trace to the auth target before
+   rating severity), broad token permissions, deploy-on-push without gates.
+6. IaC: *.tf (state in git, unencrypted backend, old providers), helm values
+   with secrets, k8s manifests (RBAC wildcards, latest tags).
+7. Supply chain: lockfiles (postinstall scripts, foreign registries), osv-scanner
+   or trivy if installed.
+8. Scripts: Makefile, scripts/, .vscode/tasks.json — curl|sh, sudo, secrets as args.
+9. Hygiene: .env committed, no CODEOWNERS, Dependabot off.
+
+Tool mapping (rule: if a tool covers it, the tool runs and we interpret;
+context-dependent checks are ours alone):
+- gitleaks -> secrets layer
+- trivy fs --scanners misconfig,secret -> IaC + containers
+- osv-scanner -> dependency CVEs
+
+Report: use REPORT-TEMPLATE.md. Free runs end at the bridge section with the
+standard closing line. Never name the client publicly without written consent.
